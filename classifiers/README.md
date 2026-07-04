@@ -1,58 +1,90 @@
-# CS109 Coursework: Probability, Statistics & Machine Learning
+# ML Classifiers from Scratch: Naive Bayes & Logistic Regression
 
-A collection of Python projects covering core concepts in probability, statistics, and machine learning — implemented from scratch using NumPy, without relying on high-level ML libraries like scikit-learn.
+A from-scratch implementation of two classic supervised machine learning classifiers — **Naive Bayes** and **Logistic Regression** — built using only Python and NumPy (no scikit-learn). Includes an inference module that answers real-world questions (genetics, movie recommendations, and heart disease prediction) using the trained models.
 
-This repo brings together coursework completed across multiple problem sets, spanning statistical inference, resampling methods, and classic supervised learning classifiers.
+This project was completed as part of a probability & statistics course covering foundational machine learning concepts.
 
-## Repository Structure
+## What's Inside
 
-```
-.
-├── classifiers/          # Naive Bayes & Logistic Regression classifiers
-│   ├── naive_bayes.py
-│   ├── logistic_regression.py
-│   ├── questions.py
-│   ├── test_classifiers.py
-│   ├── test_questions.py
-│   └── README.md
-│
-└── statistics/           # Expectation, variance, and hypothesis testing
-    ├── cs109_pset5_email.py
-    ├── cs109_pset5_hci.py
-    ├── cs109_pset5_coursera.py
-    └── README.md
-```
+### Classifiers
+- **`naive_bayes.py`** — A Naive Bayes classifier that learns label and feature frequency counts from training data, then uses (optionally Laplace-smoothed) likelihood estimates to classify new examples.
+- **`logistic_regression.py`** — A Logistic Regression classifier trained via gradient ascent on the log-likelihood, using the sigmoid function to model class probabilities.
 
+### Inference / Analysis
+- **`questions.py`** — Uses the trained classifiers to answer applied questions across three datasets:
+  - **Netflix dataset**: estimating the probability a user likes *Love Actually*, and identifying the movies most predictive of that preference.
+  - **Ancestry dataset**: estimating the probability that a genetic marker (SNP) matches the reference genome, conditioned on ancestry.
+  - **Heart dataset**: identifying the strongest predictors of heart disease, and computing precision/recall on a held-out test set.
 
-## Projects
+### Testing
+- **`test_classifiers.py`** — Verifies that `fit()` and `predict()` produce correct label counts, feature counts, learned weights, and prediction accuracy across all datasets.
+- **`test_questions.py`** — Verifies that the applied inference questions in `questions.py` return correct results.
 
-### 📊 [Statistical Inference & Resampling](./statistics/README.md)
-Exercises in expectation, variance, bootstrap resampling, and permutation-based hypothesis testing — applied to keystroke timing data, peer grading data, and behavioral outcome data.
+## How It Works
 
-**Key concepts:** expectation & variance from raw data, bootstrap estimation of sampling variance, non-parametric permutation testing, p-value estimation.
+**Naive Bayes**
+1. `fit()` counts how often each label occurs, and how often each (feature, value, label) combination occurs in the training data.
+2. `predict()` uses these counts to compute the (log) unnormalized probability of each label for a new sample, optionally applying Laplace add-one smoothing, and predicts the higher-probability label.
 
-### 🤖 [ML Classifiers from Scratch](./classifiers/README.md)
-A Naive Bayes classifier and a Logistic Regression classifier, built from the ground up, applied to movie preference data, genetic ancestry data, and heart disease diagnostic data.
+**Logistic Regression**
+1. `fit()` performs gradient ascent on the log-likelihood to learn a weight vector (`theta`), including a bias term.
+2. `predict()` applies the sigmoid function to the linear combination of learned weights and input features, predicting label `1` when the resulting probability is ≥ 0.5.
 
-**Key concepts:** MLE vs. MAP estimation with Laplace smoothing, gradient ascent optimization, precision/recall evaluation, log-likelihood computation.
+## Running the Project
 
-## Requirements
-
-- Python ≥ 3.6
-- NumPy
+Requires Python ≥ 3.6 and NumPy.
 
 ```bash
+# Install dependencies
 pip install numpy
+
+# Run all classifier tests
+python test_classifiers.py
+
+# Run all inference/question tests
+python test_questions.py
+
+# Run specific tests only
+python test_classifiers.py predict_bayes_mle_simple fit_logistic_heart
 ```
 
-Each project folder has its own README with specific run instructions.
+You can also experiment directly in a Python shell:
 
-## About This Repository
+```python
+import numpy as np
+from naive_bayes import NaiveBayes
 
-This work was completed as part of a university course covering probability, statistics, and introductory machine learning. The core algorithmic logic in each file (the parts implementing `fit()`, `predict()`, resampling loops, etc.) reflects my own work; the surrounding scaffolding — function signatures, docstrings, and test harnesses — was provided as starter code by course staff and is credited in each subproject's README.
+n = NaiveBayes(use_mle=True)
+n.fit(np.array([[0,0,0,0], [1,1,1,1], [1,0,1,0]]), np.array([1, 0, 1]))
+n.predict(np.array([[0,1,0,1], [1,0,1,0]]))
+# array([0, 1], dtype=uint8)
+```
 
-This repo is shared publicly as a portfolio of coursework and personal learning. If you're a student currently taking a similar course, please use this as a reference for understanding concepts rather than as a source to copy from — plagiarizing coursework can have serious consequences, and the whole point of working through problems like these is what you learn by doing them yourself.
+## Key Concepts Demonstrated
+- Maximum Likelihood Estimation (MLE) vs. Maximum A Posteriori (MAP) estimation with Laplace smoothing
+- Log-likelihood and numerical stability tricks for probabilistic classifiers
+- Gradient ascent optimization for logistic regression
+- Model evaluation: accuracy, precision, and recall
+- Vectorized NumPy operations for performance
+
+## Datasets
+Three datasets were used to test and demonstrate the classifiers:
+- A small toy ("simple") dataset for sanity-checking correctness
+- A Netflix movie-preference dataset
+- A genetic ancestry (SNP) dataset
+- A heart disease diagnostic dataset
+
+*(Note: raw dataset files are not included in this repository — see note below.)*
+
+## Notes
+- This project was originally developed as a course assignment. The classifier and question logic above reflects my own implementation, written into instructor-provided starter files.
+- Because the surrounding scaffolding (docstrings, test harness, assignment instructions) was authored by course staff rather than by me, I've kept the original authorship/acknowledgment notes intact below, and left dataset files out of this repo pending confirmation that redistribution is permitted.
 
 ## Acknowledgments
-
-See individual project READMEs for full acknowledgments of course staff and material authors.
+Course materials, starter code, and datasets were provided by:
+- Tim Gianitsos — classifiers, solution code, code questions, autograder, instructions
+- Anand Shankar — comments, spec, autograder
+- Alex Tsun — comments, repo maintenance
+- Lisa Yan — spec, questions
+- Chris Piech — questions and datasets
+- Mehran Sahami — questions
